@@ -1,5 +1,6 @@
 # Source: https://disclosures-clerk.house.gov/FinancialDisclosure
 
+import difflib
 import os
 import pandas as pd
 from datetime import datetime
@@ -44,11 +45,21 @@ def read_fd_text_file(input_directory, fd_file_txt):
     return df
 
 
-def get_fd_by_last_name(df, list_of_last_names, filing_date_lag_days):
+def get_fd_by_full_name(df, list_of_full_names, filing_date_lag_days):
     
-    # Filter by last name
-    df = df[df['Last'].str.lower().isin(list_of_last_names)]
+    # Construct full name
+    df['FullName'] = df['First'].str.lower() + ' ' + df['Last'].str.lower()
 
+    # Filter by full name
+    list_of_full_names_to_keep = []
+    for full_name in list_of_full_names:
+        full_name_to_keep = difflib.get_close_matches(full_name, df['FullName'], n=1)
+
+        if len(full_name_to_keep) > 0:
+            list_of_full_names_to_keep.append(full_name_to_keep[0])
+
+    df = df[df['FullName'].isin(list_of_full_names_to_keep)]
+    
     # Filter by filing date
     date_today = datetime.today().date()
 
@@ -82,8 +93,8 @@ def main():
     output_file = config_obj.get('output', 'file_name')
 
     # Reports of individuals to keep
-    list_of_last_names = config_obj.get('input', 'list_of_last_names')
-    list_of_last_names = list_of_last_names.split(', ')
+    list_of_full_names = config_obj.get('input', 'list_of_full_names')
+    list_of_full_names = list_of_full_names.split(', ')
 
     # Reports within specified time period
     filing_date_lag_days = config_obj.getint('input', 'filing_date_lag_days')
@@ -104,9 +115,11 @@ def main():
     df = read_fd_text_file(input_directory, file_name_txt)
 
     # Return FDs of select individuals by last name
-    df = get_fd_by_last_name(df, list_of_last_names, filing_date_lag_days)
+    df = get_fd_by_full_name(df, list_of_full_names, filing_date_lag_days)
 
     # Save to a CSV file
+    df = df[['Prefix', 'FullName', 'FilingDate', 'URL']]
+
     df.to_csv(os.path.join(output_directory, output_file), index=False)
 
 
