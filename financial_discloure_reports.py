@@ -22,7 +22,7 @@ def download_fd_zip(url_source, input_directory):
 def unzips_fd_zip(input_directory, file_name):
 
     # Unzips the source file into input directory
-    os.system(f'unzip -o -d {input_directory} {input_directory}{file_name}')
+    os.system(f'unzip -o -d {input_directory} {os.path.join(input_directory, file_name)}')
 
 
 def get_fd_text_file(file_name):
@@ -73,7 +73,7 @@ def get_fd_by_full_name(df, list_of_full_names, filing_date_lag_days):
 def main():
 
     # Load config file
-    config_file = 'config.ini'
+    config_file = '/home/alexktong_92/python/usgov-fdr/config.ini'
 
     config_obj = configparser.ConfigParser()
     config_obj.read(config_file)
