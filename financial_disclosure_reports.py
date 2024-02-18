@@ -65,7 +65,11 @@ def get_fd_by_full_name(df, list_of_full_names, filing_date_lag_days):
 
     filing_date_since = date_today - pd.Timedelta(days=filing_date_lag_days)
 
+    # Only retrieve records within filing date threshold
     df = df[df['FilingDate'] >= filing_date_since]
+
+    # Sort by filing date
+    df = df.sort_values('FilingDate', ascending=False)
 
     return df
 
