@@ -73,7 +73,7 @@ def get_fd_by_full_name(df, list_of_full_names, filing_date_lag_days):
 def main():
 
     # Load config file
-    config_file = '/home/alexktong_92/python/usgov-fdr/config.ini'
+    config_file = 'config.ini'
 
     config_obj = configparser.ConfigParser()
     config_obj.read(config_file)
