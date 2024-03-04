@@ -17,12 +17,14 @@ def load_config(config_file):
     return config_obj
 
 
+# Create a directory if doesn't exists
 def create_directory(directory_path):
 
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
 
 
+# Read raw input text file
 def read_fd_text_file(directory_to_fd_file_txt):
     
     df = pd.read_csv(directory_to_fd_file_txt, sep='\t')
@@ -34,6 +36,7 @@ def read_fd_text_file(directory_to_fd_file_txt):
     return df
 
 
+# Only retrieve FD records within specified time period
 def get_fd_for_past_days(df, filing_date_lag_days):
 
     # Filter by filing date
@@ -50,6 +53,7 @@ def get_fd_for_past_days(df, filing_date_lag_days):
     return df
 
 
+# Filter FD records by name
 def get_fd_by_full_name(df, list_of_full_names):
     
     # Construct full name
@@ -58,6 +62,8 @@ def get_fd_by_full_name(df, list_of_full_names):
     # Filter by full name
     list_of_full_names_to_keep = []
     for full_name in list_of_full_names:
+
+        # Find name in raw file with closest match to input
         full_name_to_keep = difflib.get_close_matches(full_name, df['FullName'], n=1)
 
         if len(full_name_to_keep) > 0:
@@ -87,7 +93,6 @@ def main():
 
     # Return FDs within specified time period
     filing_date_lag_days = config_obj.getint('input', 'filing_date_lag_days')
-    
     df = get_fd_for_past_days(df, filing_date_lag_days)
 
     # Return FDs of select individuals by last name
@@ -98,7 +103,6 @@ def main():
 
     # Save to a CSV file
     df = df[['Prefix', 'FullName', 'FilingDate', 'URL']]
-
     df.to_csv(os.path.join(output_directory, output_file), index=False)
 
 
