@@ -73,6 +73,12 @@ def get_fd_by_full_name(df, list_of_full_names):
 
     return df
 
+# Filter FD records by filing type "P" (Periodic Transaction Report)
+def get_fd_by_filing_type(df, filing_type):
+
+    df = df[df['FilingType'] == filing_type]
+
+    return df
 
 def main():
 
@@ -100,6 +106,9 @@ def main():
     list_of_full_names = list_of_full_names.split(', ')
 
     df = get_fd_by_full_name(df, list_of_full_names)
+
+    # Return FD for Periodic Transaction Reports
+    df = get_fd_by_filing_type(df, 'P')
 
     # Save to a CSV file
     df = df[['Prefix', 'FullName', 'FilingDate', 'URL']]
